@@ -26,23 +26,26 @@ namespace HardwareShopRole
         public IConfiguration Configuration { get; }
 
         // This method gets called by the runtime. Use this method to add services to the container.
-        public void Startup.ConfigureServices(ServiceCollection services)
-            public void object Startup.ConfigureServices(IServiceCollection services)
-
+        public void ConfigureServices(Microsoft.Extensions.DependencyInjection.IServiceCollection services)
         {
             services.AddDbContext<ApplicationDbContext>(options =>
                 options.UseSqlServer(
                     Configuration.GetConnectionString("DefaultConnection")));
-            _ = services.AddIdentity<HardwareShopUser, HardwareShopRole>(options => options =>
-            {
-                options.Password.RequiereDigit = false;
-                options.Password.ReguiredLength = 4;
+            services.AddDefaultIdentity<HardwareShopUser>()
+                .AddRoles<HardwareShopRole.Models.Account.HardwareShopRole>()
+                .AddEntityFrameworkStores<ApplicationDbContext>();
+
+
+            services.Configure<IdentityOptions>(options => {
+                options.Password.RequiredLength = 4;
+                options.Password.RequireDigit = false;
+                options.Password.RequiredUniqueChars = 0;
                 options.Password.RequireNonAlphanumeric = false;
-                options.Password.RequieredUniqueChar = 0;
-                options.Password.ReguireLowercase = false;
+                options.Password.RequireLowercase = false;
                 options.Password.RequireUppercase = false;
-                options.SingIn.RequireConfirmedEmail = false;
-            }).AddEntityFrameworkStores<ApplicationDbContext>();
+                options.SignIn.RequireConfirmedEmail = false;
+
+            });
             services.AddControllersWithViews();
             services.AddRazorPages();
         }
